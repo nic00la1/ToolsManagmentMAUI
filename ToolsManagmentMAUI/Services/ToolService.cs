@@ -54,7 +54,8 @@ public class ToolService : INotifyPropertyChanged
 
     public async Task AddToolAsync(Tool tool)
     {
-        Tools.Add(tool);
+        Tools.Add(new Tool
+            { Name = tool.Name, Quantity = tool.Quantity, Price = tool.Price });
         await SaveToolsAsync();
         ToolAdded?.Invoke(this, EventArgs.Empty);
         OnPropertyChanged(nameof(Tools));

@@ -24,6 +24,7 @@
     <ShellContent
         Title="Tool Details"
         ContentTemplate="{DataTemplate local:ToolsDetailsPage}"
-        Route="ToolsDetailsPage" />
+        Route="ToolsDetailsPage"
+        FlyoutItemIsVisible="False" />
 
 </Shell>

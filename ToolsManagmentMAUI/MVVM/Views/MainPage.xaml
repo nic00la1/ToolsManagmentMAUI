@@ -4,7 +4,8 @@
              xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
              x:Class="ToolsManagmentMAUI.MVVM.Views.MainPage"
              x:Name="MainPageInstance"
-             BackgroundColor="#f8f8f8">
+             BackgroundColor="#f8f8f8"
+             Title="Lista narzędzi">
 
     <ContentPage.BindingContext>
         <vm:MainPageViewModel />

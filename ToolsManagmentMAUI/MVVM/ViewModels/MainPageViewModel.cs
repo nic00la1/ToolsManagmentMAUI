@@ -11,12 +11,30 @@ public class MainPageViewModel : BindableObject
 {
     private readonly ToolService _toolService;
     private readonly AlertService _alertService;
+    private ObservableCollection<Tool> _allTools;
 
     public ObservableCollection<Tool> Tools { get; set; }
     public ICommand LoadToolsCommand { get; }
     public ICommand DeleteToolCommand { get; }
     public ICommand NavigateToAddToolCommand { get; }
     public ICommand NavigateToDetailsCommand { get; }
+    public ICommand SearchCommand { get; }
+
+    private string _searchQuery;
+
+    public string SearchQuery
+    {
+        get => _searchQuery;
+        set
+        {
+            if (_searchQuery != value)
+            {
+                _searchQuery = value;
+                OnPropertyChanged();
+                ExecuteSearch();
+            }
+        }
+    }
 
     public MainPageViewModel()
     {
@@ -25,6 +43,7 @@ public class MainPageViewModel : BindableObject
         _toolService.ToolAdded += OnToolAdded;
         _toolService.PropertyChanged += OnToolsChanged;
         Tools = new ObservableCollection<Tool>();
+        _allTools = new ObservableCollection<Tool>();
         LoadToolsCommand = new Command(async () => await LoadToolsAsync());
         DeleteToolCommand =
             new Command<Tool>(async (tool) => await DeleteToolAsync(tool));
@@ -32,6 +51,7 @@ public class MainPageViewModel : BindableObject
             new Command(async () => await NavigateToAddToolAsync());
         NavigateToDetailsCommand = new Command<Tool>(async (tool) =>
             await NavigateToDetailsAsync(tool));
+        SearchCommand = new Command(ExecuteSearch);
         LoadToolsCommand.Execute(null);
     }
 
@@ -42,6 +62,7 @@ public class MainPageViewModel : BindableObject
         _toolService.ToolAdded += OnToolAdded;
         _toolService.PropertyChanged += OnToolsChanged;
         Tools = new ObservableCollection<Tool>();
+        _allTools = new ObservableCollection<Tool>();
         LoadToolsCommand = new Command(async () => await LoadToolsAsync());
         DeleteToolCommand =
             new Command<Tool>(async (tool) => await DeleteToolAsync(tool));
@@ -49,6 +70,7 @@ public class MainPageViewModel : BindableObject
             new Command(async () => await NavigateToAddToolAsync());
         NavigateToDetailsCommand = new Command<Tool>(async (tool) =>
             await NavigateToDetailsAsync(tool));
+        SearchCommand = new Command(ExecuteSearch);
         LoadToolsCommand.Execute(null);
     }
 
@@ -70,7 +92,12 @@ public class MainPageViewModel : BindableObject
     {
         await _toolService.LoadToolsAsync();
         Tools.Clear();
-        foreach (Tool tool in _toolService.Tools) Tools.Add(tool);
+        _allTools.Clear();
+        foreach (Tool tool in _toolService.Tools)
+        {
+            Tools.Add(tool);
+            _allTools.Add(tool);
+        }
     }
 
     private async Task DeleteToolAsync(Tool tool)
@@ -103,5 +130,15 @@ public class MainPageViewModel : BindableObject
             return;
 
         await Shell.Current.GoToAsync($"///ToolsDetailsPage?ToolId={tool.Id}");
+    }
+
+    private void ExecuteSearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery))
+            Tools = new ObservableCollection<Tool>(_allTools);
+        else
+            Tools = new ObservableCollection<Tool>(_allTools.Where(t =>
+                t.Name.ToLower().Contains(SearchQuery.ToLower())));
+        OnPropertyChanged(nameof(Tools));
     }
 }

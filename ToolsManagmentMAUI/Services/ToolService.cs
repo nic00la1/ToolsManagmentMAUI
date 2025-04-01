@@ -19,6 +19,12 @@ public class ToolService : INotifyPropertyChanged
     {
         _filePath = Path.Combine(FileSystem.AppDataDirectory, "tools.json");
         _tools = new ObservableCollection<Tool>();
+        InitializeAsync();
+    }
+
+    private async void InitializeAsync()
+    {
+        await LoadToolsAsync();
     }
 
     public ObservableCollection<Tool> Tools
@@ -42,8 +48,7 @@ public class ToolService : INotifyPropertyChanged
         string json = await File.ReadAllTextAsync(_filePath);
         List<Tool> tools = JsonSerializer.Deserialize<List<Tool>>(json) ??
             new List<Tool>();
-        Tools.Clear();
-        foreach (Tool tool in tools) Tools.Add(tool);
+        Tools = new ObservableCollection<Tool>(tools);
     }
 
     public async Task SaveToolsAsync()

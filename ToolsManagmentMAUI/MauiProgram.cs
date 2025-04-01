@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using ToolsManagmentMAUI.Services;
 
 namespace ToolsManagmentMAUI;
 
@@ -18,6 +19,9 @@ public static class MauiProgram
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
+
+		builder.Services.AddSingleton<ToolService>();
+		builder.Services.AddSingleton<AlertService>();
 
 		return builder.Build();
 	}

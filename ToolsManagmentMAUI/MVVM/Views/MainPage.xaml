@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
+             x:Class="ToolsManagmentMAUI.MVVM.Views.MainPage">
+
+    <ContentPage.BindingContext>
+        <vm:MainPageViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Button Text="Dodaj narzędzie" Command="{Binding NavigateToAddToolCommand}" />
+            <ListView ItemsSource="{Binding Tools}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal">
+                                <Label Text="{Binding Name}" VerticalOptions="Center" />
+                                <Button Text="Szczegóły" Command="{Binding BindingContext.NavigateToDetailsCommand, Source={x:Reference Name=MainPage}}" CommandParameter="{Binding .}" />
+                                <Button Text="Usuń" Command="{Binding BindingContext.DeleteToolCommand, Source={x:Reference Name=MainPage}}" CommandParameter="{Binding .}" />
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

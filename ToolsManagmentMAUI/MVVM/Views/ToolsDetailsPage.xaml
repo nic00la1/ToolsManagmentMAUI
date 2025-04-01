@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ToolsManagmentMAUI.MVVM.Views.ToolsDetailsPage"
+             xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
+             Title="ToolsDetailsPage">
+
+    <ContentPage.BindingContext>
+        <vm:ToolDetailsViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Padding="30,0" Spacing="25">
+        <Label Text="{Binding Tool.Name}" FontSize="Large" />
+        <Label Text="{Binding Tool.Description}" />
+        <Label Text="{Binding Tool.Category}" />
+    </VerticalStackLayout>
+</ContentPage>

@@ -5,14 +5,22 @@ public class AlertService
     public async Task<bool> ShowConfirmationAsync(string title, string message)
     {
         return await Application.Current.MainPage.DisplayAlert(title, message,
-            "OK", "Anuluj");
+            "Tak", "Nie");
     }
 
     public async Task ShowMessageAsync(string title, string message)
     {
         await Application.Current.MainPage.DisplayAlert(title, message, "OK");
+    }
 
-        // Przejdü do strony g≥Ûwnej
-        await Shell.Current.GoToAsync("//MainPage");
+    public async Task ShowSuccessMessageAsync(string message)
+    {
+        await Application.Current.MainPage.DisplayAlert("Sukces", message,
+            "OK");
+    }
+
+    public async Task ShowErrorMessageAsync(string message)
+    {
+        await Application.Current.MainPage.DisplayAlert("B≥πd", message, "OK");
     }
 }

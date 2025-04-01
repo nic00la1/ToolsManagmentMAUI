@@ -59,11 +59,29 @@ public class ToolService : INotifyPropertyChanged
 
     public async Task AddToolAsync(Tool tool)
     {
+        tool.Id =
+            Tools.Any() ? Tools.Max(t => t.Id) + 1 : 1; // Ensure unique Id
         Tools.Add(new Tool
-            { Name = tool.Name, Quantity = tool.Quantity, Price = tool.Price });
+        {
+            Id = tool.Id, Name = tool.Name, Quantity = tool.Quantity,
+            Price = tool.Price
+        });
         await SaveToolsAsync();
         ToolAdded?.Invoke(this, EventArgs.Empty);
         OnPropertyChanged(nameof(Tools));
+    }
+
+    public async Task UpdateToolAsync(Tool tool)
+    {
+        Tool? existingTool = Tools.FirstOrDefault(t => t.Id == tool.Id);
+        if (existingTool != null)
+        {
+            existingTool.Name = tool.Name;
+            existingTool.Quantity = tool.Quantity;
+            existingTool.Price = tool.Price;
+            await SaveToolsAsync();
+            OnPropertyChanged(nameof(Tools));
+        }
     }
 
     public async Task RemoveToolAsync(Tool tool)
@@ -71,6 +89,12 @@ public class ToolService : INotifyPropertyChanged
         Tools.Remove(tool);
         await SaveToolsAsync();
         OnPropertyChanged(nameof(Tools));
+    }
+
+    public async Task<Tool> GetToolByIdAsync(int id)
+    {
+        await LoadToolsAsync();
+        return Tools.FirstOrDefault(t => t.Id == id);
     }
 
     protected void OnPropertyChanged(

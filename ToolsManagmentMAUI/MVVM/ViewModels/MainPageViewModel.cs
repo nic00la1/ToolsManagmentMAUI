@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using ToolsManagmentMAUI.Models;
+using ToolsManagmentMAUI.MVVM.Views;
 using ToolsManagmentMAUI.Services;
 
 namespace ToolsManagmentMAUI.ViewModels;
@@ -75,8 +76,20 @@ public class MainPageViewModel : BindableObject
     private async Task DeleteToolAsync(Tool tool)
     {
         bool confirm = await _alertService.ShowConfirmationAsync(
-            "Potwierdzenie", "Czy na pewno chcesz usun¹æ to narzêdzie?");
-        if (confirm) await _toolService.RemoveToolAsync(tool);
+            "Usuñ narzêdzie", "Czy aby na pewno chcesz usun¹æ to narzêdzie?");
+        if (confirm)
+            try
+            {
+                await _toolService.RemoveToolAsync(tool);
+                await _alertService.ShowSuccessMessageAsync(
+                    "Narzêdzie zosta³o usuniête.");
+                await Shell.Current.GoToAsync("//MainPage");
+            }
+            catch (Exception)
+            {
+                await _alertService.ShowErrorMessageAsync(
+                    "Nie uda³o siê usun¹æ narzêdzia.");
+            }
     }
 
     private async Task NavigateToAddToolAsync()
@@ -86,11 +99,9 @@ public class MainPageViewModel : BindableObject
 
     private async Task NavigateToDetailsAsync(Tool tool)
     {
-        Dictionary<string, object> navigationParameter = new()
-        {
-            { "Tool", tool }
-        };
-        await Shell.Current.GoToAsync("///ToolsDetailsPage",
-            navigationParameter);
+        if (tool == null)
+            return;
+
+        await Shell.Current.GoToAsync($"///ToolsDetailsPage?ToolId={tool.Id}");
     }
 }

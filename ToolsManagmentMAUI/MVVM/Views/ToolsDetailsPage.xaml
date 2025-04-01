@@ -9,9 +9,17 @@
         <vm:ToolDetailsViewModel />
     </ContentPage.BindingContext>
 
-    <VerticalStackLayout Padding="30,0" Spacing="25">
-        <Label Text="{Binding Tool.Name}" FontSize="Large" />
-        <Label Text="{Binding Tool.Description}" />
-        <Label Text="{Binding Tool.Category}" />
-    </VerticalStackLayout>
+    <StackLayout Padding="10">
+        <Label Text="Nazwa narzędzia" FontSize="Medium" />
+        <Entry Text="{Binding Tool.Name}" Placeholder="Nazwa narzędzia" />
+
+        <Label Text="Ilość" FontSize="Medium" />
+        <Entry Text="{Binding Tool.Quantity}" Placeholder="Ilość" Keyboard="Numeric" />
+
+        <Label Text="Cena" FontSize="Medium" />
+        <Entry Text="{Binding Tool.Price}" Placeholder="Cena" Keyboard="Numeric" />
+
+        <Button Text="Zapisz zmiany" Command="{Binding SaveCommand}" />
+        <Button Text="Usuń" Command="{Binding DeleteCommand}" />
+    </StackLayout>
 </ContentPage>

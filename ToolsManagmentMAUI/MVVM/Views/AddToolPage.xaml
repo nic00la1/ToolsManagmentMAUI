@@ -1,24 +1,64 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ToolsManagmentMAUI.MVVM.Views.AddToolPage"
              xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
-             Title="AddToolPage">
+             x:Class="ToolsManagmentMAUI.MVVM.Views.AddToolPage"
+             BackgroundColor="#f8f8f8"
+             Title="Dodaj narzędzie">
+
     <ContentPage.BindingContext>
         <vm:AddToolViewModel />
     </ContentPage.BindingContext>
 
     <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
-            <Label Text="Nazwa narzędzia" />
-            <Entry Placeholder="Nazwa narzędzia" Text="{Binding Tool.Name}" />
-            <Label Text="Ilość" />
-            <Entry Placeholder="Ilość" Text="{Binding Tool.Quantity}" Keyboard="Numeric" />
-            <Label Text="Cena w zł" />
-            <Entry Placeholder="Cena" Text="{Binding Tool.Price}" Keyboard="Numeric" />
-            <Button Text="Zapisz" Command="{Binding AddToolCommand}" />
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <!-- Tool Name -->
+            <Label Text="Nazwa narzędzia"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   TextColor="#007ACC" />
+            <Entry Placeholder="Nazwa narzędzia"
+                   Text="{Binding Tool.Name}"
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   Margin="0,0,0,20" />
+
+            <!-- Tool Quantity -->
+            <Label Text="Ilość"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   TextColor="#007ACC" />
+            <Entry Placeholder="Ilość"
+                   Text="{Binding Tool.Quantity}"
+                   Keyboard="Numeric"
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   Margin="0,0,0,20" />
+
+            <!-- Tool Price -->
+            <Label Text="Cena w zł"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   TextColor="#007ACC" />
+            <Entry Placeholder="Cena"
+                   Text="{Binding Tool.Price}"
+                   Keyboard="Numeric"
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   Margin="0,0,0,20" />
+
+            <!-- Save Button -->
+            <Button Text="Zapisz"
+                    Command="{Binding AddToolCommand}"
+                    BackgroundColor="#007ACC"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Padding="10"
+                    HorizontalOptions="FillAndExpand">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xf00c;" FontFamily="FontAwesome" Size="20" Color="White" />
+                </Button.ImageSource>
+            </Button>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

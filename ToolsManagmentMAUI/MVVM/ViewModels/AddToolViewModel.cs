@@ -48,5 +48,7 @@ public class AddToolViewModel : BindableObject
         await _alertService.ShowMessageAsync("Sukces",
             "Narzêdzie zosta³o pomyœlnie dodane.");
         Tool = new Tool(); // Utwórz now¹ instancjê obiektu Tool po dodaniu narzêdzia
+        await Shell.Current
+            .GoToAsync("//MainPage"); // Przenieœ u¿ytkownika do MainPage
     }
 }

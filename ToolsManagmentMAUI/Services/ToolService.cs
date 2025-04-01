@@ -1,42 +1,77 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ToolsManagmentMAUI.Models;
 
-public class ToolService
+public class ToolService : INotifyPropertyChanged
 {
     private readonly string _filePath;
+    private ObservableCollection<Tool> _tools;
 
     public event EventHandler ToolAdded;
+    public event PropertyChangedEventHandler PropertyChanged;
 
     public ToolService()
     {
         _filePath = Path.Combine(FileSystem.AppDataDirectory, "tools.json");
+        _tools = new ObservableCollection<Tool>();
     }
 
-    public async Task<List<Tool>> LoadToolsAsync()
+    public ObservableCollection<Tool> Tools
+    {
+        get => _tools;
+        private set
+        {
+            _tools = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public async Task LoadToolsAsync()
     {
         if (!File.Exists(_filePath))
         {
-            return new List<Tool>();
+            Tools = new ObservableCollection<Tool>();
+            return;
         }
 
-        var json = await File.ReadAllTextAsync(_filePath);
-        return JsonSerializer.Deserialize<List<Tool>>(json) ?? new List<Tool>();
+        string json = await File.ReadAllTextAsync(_filePath);
+        List<Tool> tools = JsonSerializer.Deserialize<List<Tool>>(json) ??
+            new List<Tool>();
+        Tools.Clear();
+        foreach (Tool tool in tools) Tools.Add(tool);
     }
 
-    public async Task SaveToolsAsync(List<Tool> tools)
+    public async Task SaveToolsAsync()
     {
-        var json = JsonSerializer.Serialize(tools);
+        string json = JsonSerializer.Serialize(Tools);
         await File.WriteAllTextAsync(_filePath, json);
     }
 
     public async Task AddToolAsync(Tool tool)
     {
-        var tools = await LoadToolsAsync();
-        tools.Add(tool);
-        await SaveToolsAsync(tools);
+        Tools.Add(tool);
+        await SaveToolsAsync();
         ToolAdded?.Invoke(this, EventArgs.Empty);
+        OnPropertyChanged(nameof(Tools));
+    }
+
+    public async Task RemoveToolAsync(Tool tool)
+    {
+        Tools.Remove(tool);
+        await SaveToolsAsync();
+        OnPropertyChanged(nameof(Tools));
+    }
+
+    protected void OnPropertyChanged(
+        [CallerMemberName] string propertyName = null
+    )
+    {
+        PropertyChanged?.Invoke(this,
+            new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Input;
 using ToolsManagmentMAUI.Models;
 using ToolsManagmentMAUI.Services;
 
 namespace ToolsManagmentMAUI.ViewModels;
+
 public class MainPageViewModel : BindableObject
 {
     private readonly ToolService _toolService;
@@ -20,11 +22,32 @@ public class MainPageViewModel : BindableObject
         _toolService = new ToolService();
         _alertService = new AlertService();
         _toolService.ToolAdded += OnToolAdded;
+        _toolService.PropertyChanged += OnToolsChanged;
         Tools = new ObservableCollection<Tool>();
         LoadToolsCommand = new Command(async () => await LoadToolsAsync());
-        DeleteToolCommand = new Command<Tool>(async (tool) => await DeleteToolAsync(tool));
-        NavigateToAddToolCommand = new Command(async () => await NavigateToAddToolAsync());
-        NavigateToDetailsCommand = new Command<Tool>(async (tool) => await NavigateToDetailsAsync(tool));
+        DeleteToolCommand =
+            new Command<Tool>(async (tool) => await DeleteToolAsync(tool));
+        NavigateToAddToolCommand =
+            new Command(async () => await NavigateToAddToolAsync());
+        NavigateToDetailsCommand = new Command<Tool>(async (tool) =>
+            await NavigateToDetailsAsync(tool));
+        LoadToolsCommand.Execute(null);
+    }
+
+    public MainPageViewModel(ToolService toolService, AlertService alertService)
+    {
+        _toolService = toolService;
+        _alertService = alertService;
+        _toolService.ToolAdded += OnToolAdded;
+        _toolService.PropertyChanged += OnToolsChanged;
+        Tools = new ObservableCollection<Tool>();
+        LoadToolsCommand = new Command(async () => await LoadToolsAsync());
+        DeleteToolCommand =
+            new Command<Tool>(async (tool) => await DeleteToolAsync(tool));
+        NavigateToAddToolCommand =
+            new Command(async () => await NavigateToAddToolAsync());
+        NavigateToDetailsCommand = new Command<Tool>(async (tool) =>
+            await NavigateToDetailsAsync(tool));
         LoadToolsCommand.Execute(null);
     }
 
@@ -33,24 +56,27 @@ public class MainPageViewModel : BindableObject
         await LoadToolsAsync();
     }
 
-    private async Task LoadToolsAsync()
+    private void OnToolsChanged(object sender, PropertyChangedEventArgs e)
     {
-        var tools = await _toolService.LoadToolsAsync();
-        Tools.Clear();
-        foreach (var tool in tools)
+        if (e.PropertyName == nameof(ToolService.Tools))
         {
-            Tools.Add(tool);
+            Tools.Clear();
+            foreach (Tool tool in _toolService.Tools) Tools.Add(tool);
         }
+    }
+
+    public async Task LoadToolsAsync()
+    {
+        await _toolService.LoadToolsAsync();
+        Tools.Clear();
+        foreach (Tool tool in _toolService.Tools) Tools.Add(tool);
     }
 
     private async Task DeleteToolAsync(Tool tool)
     {
-        var confirm = await _alertService.ShowConfirmationAsync("Potwierdzenie", "Czy na pewno chcesz usun¹æ to narzêdzie?");
-        if (confirm)
-        {
-            Tools.Remove(tool);
-            await _toolService.SaveToolsAsync(Tools.ToList());
-        }
+        bool confirm = await _alertService.ShowConfirmationAsync(
+            "Potwierdzenie", "Czy na pewno chcesz usun¹æ to narzêdzie?");
+        if (confirm) await _toolService.RemoveToolAsync(tool);
     }
 
     private async Task NavigateToAddToolAsync()
@@ -60,10 +86,11 @@ public class MainPageViewModel : BindableObject
 
     private async Task NavigateToDetailsAsync(Tool tool)
     {
-        var navigationParameter = new Dictionary<string, object>
+        Dictionary<string, object> navigationParameter = new()
         {
             { "Tool", tool }
         };
-        await Shell.Current.GoToAsync("///ToolsDetailsPage", navigationParameter);
+        await Shell.Current.GoToAsync("///ToolsDetailsPage",
+            navigationParameter);
     }
 }

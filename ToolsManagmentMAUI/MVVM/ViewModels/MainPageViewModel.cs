@@ -51,16 +51,17 @@ namespace ToolsManagmentMAUI.ViewModels
 
         private async Task NavigateToAddToolAsync()
         {
-            await Shell.Current.GoToAsync(nameof(AddToolPage));
+            await Shell.Current.GoToAsync("///AddToolPage");
         }
+
 
         private async Task NavigateToDetailsAsync(Tool tool)
         {
             var navigationParameter = new Dictionary<string, object>
-            {
-                { "Tool", tool }
-            };
-            await Shell.Current.GoToAsync(nameof(ToolsDetailsPage), navigationParameter);
+    {
+        { "Tool", tool }
+    };
+            await Shell.Current.GoToAsync("///ToolsDetailsPage", navigationParameter);
         }
     }
 }

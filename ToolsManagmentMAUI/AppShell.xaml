@@ -11,5 +11,16 @@
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
+    
+    <!--AddToolPage-->
+    <ShellContent
+        Title="Add Tool"
+        ContentTemplate="{DataTemplate local:AddToolPage}"
+        Route="AddToolPage" />
 
+    <!--ToolsDetailsPage-->
+    <ShellContent
+        Title="Tool Details"
+        ContentTemplate="{DataTemplate local:ToolsDetailsPage}"
+        Route="ToolsDetailsPage" />
 </Shell>

@@ -27,6 +27,7 @@ namespace ToolsManagmentMAUI.ViewModels
             DeleteToolCommand = new Command<Tool>(async (tool) => await DeleteToolAsync(tool));
             NavigateToAddToolCommand = new Command(async () => await NavigateToAddToolAsync());
             NavigateToDetailsCommand = new Command<Tool>(async (tool) => await NavigateToDetailsAsync(tool));
+            LoadToolsCommand.Execute(null);
         }
 
         private async Task LoadToolsAsync()
@@ -54,13 +55,12 @@ namespace ToolsManagmentMAUI.ViewModels
             await Shell.Current.GoToAsync("///AddToolPage");
         }
 
-
         private async Task NavigateToDetailsAsync(Tool tool)
         {
             var navigationParameter = new Dictionary<string, object>
-    {
-        { "Tool", tool }
-    };
+            {
+                { "Tool", tool }
+            };
             await Shell.Current.GoToAsync("///ToolsDetailsPage", navigationParameter);
         }
     }

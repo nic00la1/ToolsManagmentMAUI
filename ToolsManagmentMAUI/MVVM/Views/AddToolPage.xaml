@@ -8,10 +8,17 @@
         <vm:AddToolViewModel />
     </ContentPage.BindingContext>
 
-    <VerticalStackLayout Padding="30,0" Spacing="25">
-        <Entry Placeholder="Nazwa" Text="{Binding Name}" />
-        <Entry Placeholder="Opis" Text="{Binding Description}" />
-        <Entry Placeholder="Kategoria" Text="{Binding Category}" />
-        <Button Text="Dodaj" Command="{Binding AddToolCommand}" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Label Text="Nazwa narzędzia" />
+            <Entry Placeholder="Nazwa narzędzia" Text="{Binding Tool.Name}" />
+            <Label Text="Ilość" />
+            <Entry Placeholder="Ilość" Text="{Binding Tool.Quantity}" Keyboard="Numeric" />
+            <Label Text="Cena w zł" />
+            <Entry Placeholder="Cena" Text="{Binding Tool.Price}" Keyboard="Numeric" />
+            <Button Text="Zapisz" Command="{Binding AddToolCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

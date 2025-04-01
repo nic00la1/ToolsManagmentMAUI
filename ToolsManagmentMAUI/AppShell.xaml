@@ -7,20 +7,23 @@
     Shell.FlyoutBehavior="Flyout"
     Title="ToolsManagmentMAUI">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-    
-    <!--AddToolPage-->
-    <ShellContent
-        Title="Add Tool"
-        ContentTemplate="{DataTemplate local:AddToolPage}"
-        Route="AddToolPage" />
+    <FlyoutItem Title="Home" Route="MainPage">
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
 
-    <!--ToolsDetailsPage-->
+    <FlyoutItem Title="Add Tool" Route="AddToolPage">
+        <ShellContent
+            Title="Add Tool"
+            ContentTemplate="{DataTemplate local:AddToolPage}"
+            Route="AddToolPage" />
+    </FlyoutItem>
+
     <ShellContent
         Title="Tool Details"
         ContentTemplate="{DataTemplate local:ToolsDetailsPage}"
         Route="ToolsDetailsPage" />
+
 </Shell>

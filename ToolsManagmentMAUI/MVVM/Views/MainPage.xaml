@@ -3,35 +3,118 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
              x:Class="ToolsManagmentMAUI.MVVM.Views.MainPage"
-             x:Name="MainPageInstance">
+             x:Name="MainPageInstance"
+             BackgroundColor="#f8f8f8">
 
     <ContentPage.BindingContext>
         <vm:MainPageViewModel />
     </ContentPage.BindingContext>
 
     <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
-            <Button Text="Dodaj narzędzie" Command="{Binding NavigateToAddToolCommand}" />
-            <ListView ItemsSource="{Binding Tools}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackLayout Orientation="Horizontal" Grid.Column="0">
-                                    <Label Text="{Binding Name}" VerticalOptions="Center" />
-                                    <Label Text="{Binding Quantity}" VerticalOptions="Center"/>
-                                </StackLayout>
-                                <Label Text="{Binding Price, StringFormat='{0:C}'}" VerticalOptions="Center" Grid.Column="1" HorizontalOptions="End" />
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={x:Reference MainPageInstance}, Path=BindingContext.NavigateToDetailsCommand}" CommandParameter="{Binding .}" />
-                                </Grid.GestureRecognizers>
-                            </Grid>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <!-- Search Bar -->
+            <SearchBar Placeholder="Search tools..."
+                       Text="{Binding SearchQuery}"
+                       SearchCommand="{Binding SearchCommand}"
+                       BackgroundColor="White"
+                       Margin="0,0,0,20" />
+
+            <!-- Add Tool Button -->
+            <Button Text="Dodaj narzędzie"
+                    Command="{Binding NavigateToAddToolCommand}"
+                    BackgroundColor="#007ACC"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Padding="10"
+                    HorizontalOptions="FillAndExpand">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="&#xf067;" FontFamily="FontAwesome" Size="20" Color="White" />
+                </Button.ImageSource>
+            </Button>
+
+            <!-- Tools List -->
+            <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}" VerticalOptions="FillAndExpand">
+                <CollectionView ItemsSource="{Binding Tools}"
+                                Margin="0,20,0,0"
+                                SelectionMode="None"
+                                VerticalOptions="FillAndExpand">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Margin="10"
+                                   Padding="10"
+                                   CornerRadius="20"
+                                   HasShadow="True">
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#007ACC" Offset="0.0" />
+                                        <GradientStop Color="#00BFFF" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                                    <!-- Tool Icon -->
+                                    <Frame Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                           WidthRequest="60" HeightRequest="60"
+                                           BackgroundColor="White"
+                                           CornerRadius="30"
+                                           Padding="5"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,10,0">
+                                        <Label Text="{Binding Name[0]}"
+                                               FontSize="Large"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               TextColor="#007ACC" />
+                                    </Frame>
+
+                                    <!-- Tool Name -->
+                                    <Label Text="{Binding Name}" 
+                                           Grid.Row="0" Grid.Column="1" 
+                                           FontAttributes="Bold" 
+                                           FontSize="Medium" 
+                                           TextColor="White" />
+
+                                    <!-- Tool Quantity -->
+                                    <StackLayout Orientation="Horizontal" Grid.Row="1" Grid.Column="1" VerticalOptions="Center">
+                                        <Frame WidthRequest="30" HeightRequest="30"
+                                               BackgroundColor="White"
+                                               CornerRadius="15"
+                                               Padding="5"
+                                               VerticalOptions="Center">
+                                            <Image Source="quantity_icon.png"
+                                                   Aspect="AspectFit" />
+                                        </Frame>
+                                        <Label Text="{Binding Quantity, StringFormat='x{0}'}" 
+                                               VerticalOptions="Center" 
+                                               TextColor="White" 
+                                               Margin="10,0,0,0" />
+                                    </StackLayout>
+
+                                    <!-- Tool Price -->
+                                    <StackLayout Orientation="Horizontal" Grid.Row="2" Grid.Column="1" VerticalOptions="Center">
+                                        <Frame WidthRequest="30" HeightRequest="30"
+                                               BackgroundColor="White"
+                                               CornerRadius="15"
+                                               Padding="5"
+                                               VerticalOptions="Center">
+                                            <Image Source="price_icon.png"
+                                                   Aspect="AspectFit" />
+                                        </Frame>
+                                        <Label Text="{Binding Price, StringFormat='{0:N2} zł'}" 
+                                               VerticalOptions="Center" 
+                                               TextColor="White" 
+                                               Margin="10,0,0,0" />
+                                    </StackLayout>
+
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference MainPageInstance}, Path=BindingContext.NavigateToDetailsCommand}" CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
         </VerticalStackLayout>
     </ScrollView>
 

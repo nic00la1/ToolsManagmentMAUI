@@ -11,6 +11,7 @@ namespace ToolsManagmentMAUI.ViewModels
     public class AddToolViewModel : BindableObject
     {
         private readonly ToolService _toolService;
+        private readonly AlertService _alertService;
         private Tool _tool;
 
         public Tool Tool
@@ -28,23 +29,16 @@ namespace ToolsManagmentMAUI.ViewModels
         public AddToolViewModel()
         {
             _toolService = new ToolService();
+            _alertService = new AlertService();
             Tool = new Tool();
             AddToolCommand = new Command(async () => await AddToolAsync());
         }
 
         private async Task AddToolAsync()
         {
-            var tools = await _toolService.LoadToolsAsync();
-            tools.Add(Tool);
-            await SaveToolsToJsonAsync(tools);
+            await _toolService.AddToolAsync(Tool);
+            await _alertService.ShowMessageAsync("Sukces", "Narzêdzie zosta³o pomyœlnie dodane.");
             await Shell.Current.GoToAsync("//MainPage");
-        }
-
-        private async Task SaveToolsToJsonAsync(List<Tool> tools)
-        {
-            var filePath = Path.Combine(FileSystem.AppDataDirectory, "tools.json");
-            var json = JsonSerializer.Serialize(tools);
-            await File.WriteAllTextAsync(filePath, json);
         }
     }
 }

@@ -19,32 +19,15 @@ public class ShoppingCartService
                 Environment.GetFolderPath(Environment.SpecialFolder
                     .LocalApplicationData), CartFileName);
         _cartItems = new ObservableCollection<ShoppingCartItem>();
-        // Initialize asynchronously
-        Task.Run(async () => await InitializeAsync()).Wait();
+        InitializeAsync();
     }
 
-    private async Task InitializeAsync()
+    private async void InitializeAsync()
     {
-        if (File.Exists(_filePath))
-        {
-            string json = await File.ReadAllTextAsync(_filePath);
-            _cartItems =
-                JsonSerializer
-                    .Deserialize<
-                        ObservableCollection<ShoppingCartItem>>(json) ??
-                new ObservableCollection<ShoppingCartItem>();
-        }
+        await LoadCartAsync();
     }
 
-    public ObservableCollection<ShoppingCartItem> CartItems
-    {
-        get => _cartItems;
-        set
-        {
-            _cartItems = value;
-            Task.Run(async () => await SaveCartAsync()).Wait();
-        }
-    }
+    public ObservableCollection<ShoppingCartItem> CartItems => _cartItems;
 
     public async Task AddToCartAsync(Tool tool)
     {
@@ -78,11 +61,14 @@ public class ShoppingCartService
         if (File.Exists(_filePath))
         {
             string json = await File.ReadAllTextAsync(_filePath);
-            _cartItems =
+            ObservableCollection<ShoppingCartItem>? items =
                 JsonSerializer
-                    .Deserialize<
-                        ObservableCollection<ShoppingCartItem>>(json) ??
-                new ObservableCollection<ShoppingCartItem>();
+                    .Deserialize<ObservableCollection<ShoppingCartItem>>(json);
+            if (items != null)
+            {
+                _cartItems.Clear();
+                foreach (ShoppingCartItem item in items) _cartItems.Add(item);
+            }
         }
     }
 }

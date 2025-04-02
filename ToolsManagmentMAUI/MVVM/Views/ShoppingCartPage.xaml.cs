@@ -7,6 +7,6 @@ public partial class ShoppingCartPage : ContentPage
     public ShoppingCartPage()
     {
         InitializeComponent();
-        BindingContext = new ShoppingCartViewModel();
+        BindingContext = ViewModelLocator.ShoppingCartViewModel;
     }
 }

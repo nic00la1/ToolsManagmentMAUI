@@ -45,7 +45,7 @@ public class MainPageViewModel : BindableObject
     {
         _toolService = new ToolService();
         _alertService = new AlertService();
-        ShoppingCartViewModel = new ShoppingCartViewModel();
+        ShoppingCartViewModel = ViewModelLocator.ShoppingCartViewModel;
         _toolService.ToolAdded += OnToolAdded;
         _toolService.PropertyChanged += OnToolsChanged;
         ShoppingCartViewModel.PropertyChanged += OnCartChanged;
@@ -69,7 +69,7 @@ public class MainPageViewModel : BindableObject
     {
         _toolService = toolService;
         _alertService = alertService;
-        ShoppingCartViewModel = new ShoppingCartViewModel();
+        ShoppingCartViewModel = ViewModelLocator.ShoppingCartViewModel;
         _toolService.ToolAdded += OnToolAdded;
         _toolService.PropertyChanged += OnToolsChanged;
         ShoppingCartViewModel.PropertyChanged += OnCartChanged;
@@ -155,7 +155,7 @@ public class MainPageViewModel : BindableObject
 
     private async Task NavigateToCartAsync()
     {
-        await Shell.Current.GoToAsync("///ShoppingCartPage");
+        await Shell.Current.GoToAsync(nameof(ShoppingCartPage));
     }
 
     private void AddToCart(Tool tool)

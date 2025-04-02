@@ -23,6 +23,8 @@ public class ShoppingCartViewModel : BaseViewModel
     public decimal GrandTotal =>
         CartItems.Sum(item => item.TotalPrice) - _discount;
 
+    public decimal DiscountAmount => _discount;
+
     public string PromoCode
     {
         get => _promoCode;
@@ -63,6 +65,7 @@ public class ShoppingCartViewModel : BaseViewModel
         await _shoppingCartService.LoadCartAsync();
         OnPropertyChanged(nameof(TotalItems));
         OnPropertyChanged(nameof(GrandTotal));
+        OnPropertyChanged(nameof(DiscountAmount));
     }
 
     private async Task AddToCartAsync(Tool tool)
@@ -70,6 +73,7 @@ public class ShoppingCartViewModel : BaseViewModel
         await _shoppingCartService.AddToCartAsync(tool);
         OnPropertyChanged(nameof(TotalItems));
         OnPropertyChanged(nameof(GrandTotal));
+        OnPropertyChanged(nameof(DiscountAmount));
     }
 
     private async Task RemoveFromCartAsync(ShoppingCartItem item)
@@ -77,6 +81,7 @@ public class ShoppingCartViewModel : BaseViewModel
         await _shoppingCartService.RemoveFromCartAsync(item);
         OnPropertyChanged(nameof(TotalItems));
         OnPropertyChanged(nameof(GrandTotal));
+        OnPropertyChanged(nameof(DiscountAmount));
     }
 
     private async Task IncreaseQuantityAsync(ShoppingCartItem item)
@@ -133,6 +138,7 @@ public class ShoppingCartViewModel : BaseViewModel
         }
 
         OnPropertyChanged(nameof(GrandTotal));
+        OnPropertyChanged(nameof(DiscountAmount));
     }
 
     private void Checkout()
@@ -144,11 +150,13 @@ public class ShoppingCartViewModel : BaseViewModel
         _discount = 0;
         _isPromoCodeApplied = false;
         OnPropertyChanged(nameof(GrandTotal));
+        OnPropertyChanged(nameof(DiscountAmount));
     }
 
     private void UpdateCart()
     {
         OnPropertyChanged(nameof(TotalItems));
         OnPropertyChanged(nameof(GrandTotal));
+        OnPropertyChanged(nameof(DiscountAmount));
     }
 }

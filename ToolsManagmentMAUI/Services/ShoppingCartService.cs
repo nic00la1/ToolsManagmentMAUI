@@ -14,30 +14,50 @@ public class ShoppingCartService
 
     public ShoppingCartService()
     {
-        _filePath = Path.Combine(FileSystem.AppDataDirectory, CartFileName);
+        _filePath =
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder
+                    .LocalApplicationData), CartFileName);
         _cartItems = new ObservableCollection<ShoppingCartItem>();
-        InitializeAsync().ConfigureAwait(false);
+        // Initialize asynchronously
+        Task.Run(async () => await InitializeAsync()).Wait();
     }
 
     private async Task InitializeAsync()
     {
-        await LoadCartAsync();
+        if (File.Exists(_filePath))
+        {
+            string json = await File.ReadAllTextAsync(_filePath);
+            _cartItems =
+                JsonSerializer
+                    .Deserialize<
+                        ObservableCollection<ShoppingCartItem>>(json) ??
+                new ObservableCollection<ShoppingCartItem>();
+        }
     }
 
     public ObservableCollection<ShoppingCartItem> CartItems
     {
         get => _cartItems;
-        private set => _cartItems = value;
+        set
+        {
+            _cartItems = value;
+            Task.Run(async () => await SaveCartAsync()).Wait();
+        }
     }
 
     public async Task AddToCartAsync(Tool tool)
     {
         ShoppingCartItem? existingItem =
-            _cartItems.FirstOrDefault(i => i.Tool.Name == tool.Name);
+            _cartItems.FirstOrDefault(item => item.Tool.Id == tool.Id);
         if (existingItem != null)
-            existingItem.Quantity += 1;
-        else
-            _cartItems.Add(new ShoppingCartItem { Tool = tool, Quantity = 1 });
+        {
+            existingItem.Quantity++;
+            existingItem.TotalPrice = existingItem.Quantity * tool.Price;
+        } else
+            _cartItems.Add(new ShoppingCartItem
+                { Tool = tool, Quantity = 1, TotalPrice = tool.Price });
+
         await SaveCartAsync();
     }
 
@@ -58,10 +78,11 @@ public class ShoppingCartService
         if (File.Exists(_filePath))
         {
             string json = await File.ReadAllTextAsync(_filePath);
-            ObservableCollection<ShoppingCartItem>? cartItems =
+            _cartItems =
                 JsonSerializer
-                    .Deserialize<ObservableCollection<ShoppingCartItem>>(json);
-            if (cartItems != null) _cartItems = cartItems;
+                    .Deserialize<
+                        ObservableCollection<ShoppingCartItem>>(json) ??
+                new ObservableCollection<ShoppingCartItem>();
         }
     }
 }

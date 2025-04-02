@@ -42,14 +42,18 @@ public class ShoppingCartViewModel : BaseViewModel
     private async Task AddToCartAsync(Tool tool)
     {
         await _shoppingCartService.AddToCartAsync(tool);
-        CartItems = _shoppingCartService.CartItems;
+        CartItems =
+            new ObservableCollection<ShoppingCartItem>(_shoppingCartService
+                .CartItems);
         OnPropertyChanged(nameof(TotalItems));
     }
 
     private async Task RemoveFromCartAsync(ShoppingCartItem item)
     {
         await _shoppingCartService.RemoveFromCartAsync(item);
-        CartItems = _shoppingCartService.CartItems;
+        CartItems =
+            new ObservableCollection<ShoppingCartItem>(_shoppingCartService
+                .CartItems);
         OnPropertyChanged(nameof(TotalItems));
     }
 

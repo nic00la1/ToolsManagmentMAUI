@@ -37,6 +37,7 @@ public class ShoppingCartViewModel : BaseViewModel
     public ICommand DecreaseQuantityCommand { get; }
     public ICommand ApplyPromoCodeCommand { get; }
     public ICommand CheckoutCommand { get; }
+    public ICommand ClearCartCommand { get; }
 
     public ShoppingCartViewModel()
     {
@@ -55,6 +56,7 @@ public class ShoppingCartViewModel : BaseViewModel
         ApplyPromoCodeCommand =
             new Command(async () => await ApplyPromoCodeAsync());
         CheckoutCommand = new Command(Checkout);
+        ClearCartCommand = new Command(async () => await ClearCartAsync());
         CartItems.CollectionChanged +=
             (s, e) => OnPropertyChanged(nameof(TotalItems));
         InitializeAsync();
@@ -139,6 +141,19 @@ public class ShoppingCartViewModel : BaseViewModel
 
         OnPropertyChanged(nameof(GrandTotal));
         OnPropertyChanged(nameof(DiscountAmount));
+    }
+
+    private async Task ClearCartAsync()
+    {
+        bool confirm = await _alertService.ShowConfirmationAsync(
+            "Potwierdzenie",
+            "Czy na pewno chcesz usun¹æ wszystkie przedmioty z koszyka?");
+        if (confirm)
+        {
+            _shoppingCartService.CartItems.Clear();
+            await _shoppingCartService.SaveCartAsync();
+            UpdateCart();
+        }
     }
 
     private void Checkout()

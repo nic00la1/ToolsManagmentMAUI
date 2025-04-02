@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
+             x:Class="ToolsManagmentMAUI.MVVM.Views.ShoppingCartPage"
+             Title="Koszyk Zakupowy">
+
+    <ContentPage.BindingContext>
+        <vm:ShoppingCartViewModel />
+    </ContentPage.BindingContext>
+
+    <StackLayout Padding="20">
+        <Label Text="{Binding TotalItems, StringFormat='Total Items: {0}'}"
+               FontAttributes="Bold"
+               FontSize="Large"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               Margin="0,0,0,20" />
+
+        <CollectionView ItemsSource="{Binding CartItems}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Orientation="Horizontal" Padding="10">
+                        <Label Text="{Binding Tool.Name}" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}" VerticalOptions="Center" Margin="10,0,0,0" />
+                        <Label Text="{Binding TotalPrice, StringFormat='Total: {0:C}'}" VerticalOptions="Center" Margin="10,0,0,0" />
+                        <Button Text="Usuń" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingCartViewModel}}, Path=RemoveFromCartCommand}" CommandParameter="{Binding .}" />
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="Zamów" Command="{Binding CheckoutCommand}" BackgroundColor="#007ACC" TextColor="White" CornerRadius="10" Padding="10" HorizontalOptions="FillAndExpand" />
+    </StackLayout>
+</ContentPage>

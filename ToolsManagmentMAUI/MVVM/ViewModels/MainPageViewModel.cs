@@ -19,6 +19,9 @@ public class MainPageViewModel : BindableObject
     public ICommand NavigateToAddToolCommand { get; }
     public ICommand NavigateToDetailsCommand { get; }
     public ICommand SearchCommand { get; }
+    public ShoppingCartViewModel ShoppingCartViewModel { get; }
+    public ICommand NavigateToCartCommand { get; }
+    public ICommand AddToCartCommand { get; }
 
     private string _searchQuery;
 
@@ -36,12 +39,16 @@ public class MainPageViewModel : BindableObject
         }
     }
 
+    public int TotalItemsInCart => ShoppingCartViewModel.TotalItems;
+
     public MainPageViewModel()
     {
         _toolService = new ToolService();
         _alertService = new AlertService();
+        ShoppingCartViewModel = new ShoppingCartViewModel();
         _toolService.ToolAdded += OnToolAdded;
         _toolService.PropertyChanged += OnToolsChanged;
+        ShoppingCartViewModel.PropertyChanged += OnCartChanged;
         Tools = new ObservableCollection<Tool>();
         _allTools = new ObservableCollection<Tool>();
         LoadToolsCommand = new Command(async () => await LoadToolsAsync());
@@ -52,6 +59,9 @@ public class MainPageViewModel : BindableObject
         NavigateToDetailsCommand = new Command<Tool>(async (tool) =>
             await NavigateToDetailsAsync(tool));
         SearchCommand = new Command(ExecuteSearch);
+        NavigateToCartCommand =
+            new Command(async () => await NavigateToCartAsync());
+        AddToCartCommand = new Command<Tool>(AddToCart);
         LoadToolsCommand.Execute(null);
     }
 
@@ -59,8 +69,10 @@ public class MainPageViewModel : BindableObject
     {
         _toolService = toolService;
         _alertService = alertService;
+        ShoppingCartViewModel = new ShoppingCartViewModel();
         _toolService.ToolAdded += OnToolAdded;
         _toolService.PropertyChanged += OnToolsChanged;
+        ShoppingCartViewModel.PropertyChanged += OnCartChanged;
         Tools = new ObservableCollection<Tool>();
         _allTools = new ObservableCollection<Tool>();
         LoadToolsCommand = new Command(async () => await LoadToolsAsync());
@@ -71,6 +83,9 @@ public class MainPageViewModel : BindableObject
         NavigateToDetailsCommand = new Command<Tool>(async (tool) =>
             await NavigateToDetailsAsync(tool));
         SearchCommand = new Command(ExecuteSearch);
+        NavigateToCartCommand =
+            new Command(async () => await NavigateToCartAsync());
+        AddToCartCommand = new Command<Tool>(AddToCart);
         LoadToolsCommand.Execute(null);
     }
 
@@ -86,6 +101,12 @@ public class MainPageViewModel : BindableObject
             Tools.Clear();
             foreach (Tool tool in _toolService.Tools) Tools.Add(tool);
         }
+    }
+
+    private void OnCartChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ShoppingCartViewModel.TotalItems))
+            OnPropertyChanged(nameof(TotalItemsInCart));
     }
 
     public async Task LoadToolsAsync()
@@ -130,6 +151,16 @@ public class MainPageViewModel : BindableObject
             return;
 
         await Shell.Current.GoToAsync($"///ToolsDetailsPage?ToolId={tool.Id}");
+    }
+
+    private async Task NavigateToCartAsync()
+    {
+        await Shell.Current.GoToAsync("///ShoppingCartPage");
+    }
+
+    private void AddToCart(Tool tool)
+    {
+        ShoppingCartViewModel.AddToCartCommand.Execute(tool);
     }
 
     private void ExecuteSearch()

@@ -14,15 +14,22 @@
             Route="MainPage" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Add Tool" Route="AddToolPage">
+    <FlyoutItem Title="Dodaj narzędzie" Route="AddToolPage">
         <ShellContent
-            Title="Add Tool"
+            Title="Dodaj narzędzie"
             ContentTemplate="{DataTemplate local:AddToolPage}"
             Route="AddToolPage" />
     </FlyoutItem>
 
+    <FlyoutItem Title="Koszyk Zakupowy" Route="ShoppingCartPage">
+        <ShellContent 
+            Title="Koszyk Zakupowy" 
+            Route="ShoppingCartPage" 
+            ContentTemplate="{DataTemplate local:ShoppingCartPage}"  />
+    </FlyoutItem>
+    
     <ShellContent
-        Title="Tool Details"
+        Title="Szczegóły narzędzia"
         ContentTemplate="{DataTemplate local:ToolsDetailsPage}"
         Route="ToolsDetailsPage"
         FlyoutItemIsVisible="False" />

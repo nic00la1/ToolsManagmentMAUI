@@ -7,6 +7,17 @@
              BackgroundColor="#f8f8f8"
              Title="Lista narzędzi">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{Binding TotalItemsInCart}"
+                     Command="{Binding NavigateToCartCommand}"
+                     Order="Primary"
+                     Priority="0">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xf07a;" FontFamily="FontAwesome" Size="20" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
     <ContentPage.BindingContext>
         <vm:MainPageViewModel />
     </ContentPage.BindingContext>
@@ -14,7 +25,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
             <!-- Search Bar -->
-            <SearchBar Placeholder="Search tools..."
+            <SearchBar Placeholder="Wyszukaj narzędzi..."
                        Text="{Binding SearchQuery}"
                        SearchCommand="{Binding SearchCommand}"
                        BackgroundColor="White"
@@ -61,7 +72,7 @@
                                            Padding="5"
                                            VerticalOptions="Center"
                                            Margin="0,0,10,0">
-                                        <Label Text="{Binding Name[0]}"
+                                        <Label Text="{Binding FirstLetter}"
                                                FontSize="Large"
                                                FontAttributes="Bold"
                                                HorizontalOptions="Center"
@@ -107,6 +118,20 @@
                                                TextColor="White" 
                                                Margin="10,0,0,0" />
                                     </StackLayout>
+
+                                    <!-- Add to Cart Button -->
+                                    <Button Text="Dodaj do koszyka"
+                                            Command="{Binding Source={x:Reference MainPageInstance}, Path=BindingContext.AddToCartCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#007ACC"
+                                            TextColor="White"
+                                            CornerRadius="10"
+                                            Padding="10"
+                                            HorizontalOptions="FillAndExpand">
+                                        <Button.ImageSource>
+                                            <FontImageSource Glyph="&#xf07a;" FontFamily="FontAwesome" Size="20" Color="White" />
+                                        </Button.ImageSource>
+                                    </Button>
 
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={x:Reference MainPageInstance}, Path=BindingContext.NavigateToDetailsCommand}" CommandParameter="{Binding .}" />

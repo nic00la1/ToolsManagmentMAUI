@@ -58,32 +58,26 @@ public class ShoppingCartViewModel : BaseViewModel
         CheckoutCommand = new Command(Checkout);
         ClearCartCommand = new Command(async () => await ClearCartAsync());
         CartItems.CollectionChanged +=
-            (s, e) => OnPropertyChanged(nameof(TotalItems));
+            (s, e) => UpdateCart();
         InitializeAsync();
     }
 
     private async void InitializeAsync()
     {
         await _shoppingCartService.LoadCartAsync();
-        OnPropertyChanged(nameof(TotalItems));
-        OnPropertyChanged(nameof(GrandTotal));
-        OnPropertyChanged(nameof(DiscountAmount));
+        UpdateCart();
     }
 
     private async Task AddToCartAsync(Tool tool)
     {
         await _shoppingCartService.AddToCartAsync(tool);
-        OnPropertyChanged(nameof(TotalItems));
-        OnPropertyChanged(nameof(GrandTotal));
-        OnPropertyChanged(nameof(DiscountAmount));
+        UpdateCart();
     }
 
     private async Task RemoveFromCartAsync(ShoppingCartItem item)
     {
         await _shoppingCartService.RemoveFromCartAsync(item);
-        OnPropertyChanged(nameof(TotalItems));
-        OnPropertyChanged(nameof(GrandTotal));
-        OnPropertyChanged(nameof(DiscountAmount));
+        UpdateCart();
     }
 
     private async Task IncreaseQuantityAsync(ShoppingCartItem item)
@@ -120,15 +114,11 @@ public class ShoppingCartViewModel : BaseViewModel
         // Example logic for applying a discount based on the promo code
         if (PromoCode == "DISCOUNT10")
         {
-            _discount =
-                CartItems.Sum(item => item.TotalPrice) * 0.10m; // 10% discount
             _isPromoCodeApplied = true;
             await _alertService.ShowSuccessMessageAsync(
                 "10% Zni¿ki w³aœnie wlecia³o, na twoje produkty.");
         } else if (PromoCode == "DISCOUNT20")
         {
-            _discount =
-                CartItems.Sum(item => item.TotalPrice) * 0.20m; // 20% discount
             _isPromoCodeApplied = true;
             await _alertService.ShowSuccessMessageAsync(
                 "20% Zni¿ki w³aœnie wlecia³o, na twoje produkty.");
@@ -137,10 +127,10 @@ public class ShoppingCartViewModel : BaseViewModel
             _discount = 0;
             await _alertService.ShowErrorMessageAsync(
                 "Niepoprawny kod rabatowy!");
+            return;
         }
 
-        OnPropertyChanged(nameof(GrandTotal));
-        OnPropertyChanged(nameof(DiscountAmount));
+        UpdateCart();
     }
 
     private async Task ClearCartAsync()
@@ -170,6 +160,19 @@ public class ShoppingCartViewModel : BaseViewModel
 
     private void UpdateCart()
     {
+        if (_isPromoCodeApplied)
+        {
+            if (PromoCode == "DISCOUNT10")
+                _discount =
+                    CartItems.Sum(item => item.TotalPrice) *
+                    0.10m; // 10% discount
+            else if (PromoCode == "DISCOUNT20")
+                _discount =
+                    CartItems.Sum(item => item.TotalPrice) *
+                    0.20m; // 20% discount
+        } else
+            _discount = 0;
+
         OnPropertyChanged(nameof(TotalItems));
         OnPropertyChanged(nameof(GrandTotal));
         OnPropertyChanged(nameof(DiscountAmount));

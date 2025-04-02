@@ -10,22 +10,36 @@ namespace ToolsManagmentMAUI.ViewModels;
 public class ShoppingCartViewModel : BaseViewModel
 {
     private readonly ShoppingCartService _shoppingCartService;
+    private readonly AlertService _alertService;
+    private string _promoCode;
+    private decimal _discount;
+    private bool _isPromoCodeApplied;
 
     public ObservableCollection<ShoppingCartItem> CartItems =>
         _shoppingCartService.CartItems;
 
     public int TotalItems => CartItems.Sum(item => item.Quantity);
-    public decimal GrandTotal => CartItems.Sum(item => item.TotalPrice);
+
+    public decimal GrandTotal =>
+        CartItems.Sum(item => item.TotalPrice) - _discount;
+
+    public string PromoCode
+    {
+        get => _promoCode;
+        set => SetProperty(ref _promoCode, value);
+    }
 
     public ICommand AddToCartCommand { get; }
     public ICommand RemoveFromCartCommand { get; }
     public ICommand IncreaseQuantityCommand { get; }
     public ICommand DecreaseQuantityCommand { get; }
+    public ICommand ApplyPromoCodeCommand { get; }
     public ICommand CheckoutCommand { get; }
 
     public ShoppingCartViewModel()
     {
         _shoppingCartService = new ShoppingCartService();
+        _alertService = new AlertService();
         AddToCartCommand =
             new Command<Tool>(async (tool) => await AddToCartAsync(tool));
         RemoveFromCartCommand = new Command<ShoppingCartItem>(async (item) =>
@@ -36,6 +50,8 @@ public class ShoppingCartViewModel : BaseViewModel
         DecreaseQuantityCommand =
             new Command<ShoppingCartItem>(async (item) =>
                 await DecreaseQuantityAsync(item));
+        ApplyPromoCodeCommand =
+            new Command(async () => await ApplyPromoCodeAsync());
         CheckoutCommand = new Command(Checkout);
         CartItems.CollectionChanged +=
             (s, e) => OnPropertyChanged(nameof(TotalItems));
@@ -85,9 +101,49 @@ public class ShoppingCartViewModel : BaseViewModel
         }
     }
 
+    private async Task ApplyPromoCodeAsync()
+    {
+        if (_isPromoCodeApplied)
+        {
+            await _alertService.ShowErrorMessageAsync(
+                "Kod rabatowy zosta³ ju¿ u¿yty.");
+            return;
+        }
+
+        // Example logic for applying a discount based on the promo code
+        if (PromoCode == "DISCOUNT10")
+        {
+            _discount =
+                CartItems.Sum(item => item.TotalPrice) * 0.10m; // 10% discount
+            _isPromoCodeApplied = true;
+            await _alertService.ShowSuccessMessageAsync(
+                "10% Zni¿ki w³aœnie wlecia³o, na twoje produkty.");
+        } else if (PromoCode == "DISCOUNT20")
+        {
+            _discount =
+                CartItems.Sum(item => item.TotalPrice) * 0.20m; // 20% discount
+            _isPromoCodeApplied = true;
+            await _alertService.ShowSuccessMessageAsync(
+                "20% Zni¿ki w³aœnie wlecia³o, na twoje produkty.");
+        } else
+        {
+            _discount = 0;
+            await _alertService.ShowErrorMessageAsync(
+                "Niepoprawny kod rabatowy!");
+        }
+
+        OnPropertyChanged(nameof(GrandTotal));
+    }
+
     private void Checkout()
     {
         // Implement checkout logic here
+
+        // Reset promo code and related properties after checkout
+        PromoCode = string.Empty;
+        _discount = 0;
+        _isPromoCodeApplied = false;
+        OnPropertyChanged(nameof(GrandTotal));
     }
 
     private void UpdateCart()

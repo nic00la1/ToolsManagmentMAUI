@@ -80,7 +80,7 @@
                                 <!-- Tool Quantity -->
                                 <StackLayout Orientation="Horizontal" Grid.Row="1" Grid.Column="1" VerticalOptions="Center">
                                     <Button Text="-" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingCartViewModel}}, Path=DecreaseQuantityCommand}" CommandParameter="{Binding .}" />
-                                    <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}" 
+                                    <Label Text="{Binding Quantity, StringFormat='Ilość: {0}'}" 
                                            VerticalOptions="Center" 
                                            TextColor="White" 
                                            Margin="10,0,10,0" />
@@ -112,18 +112,19 @@
 
             <Label Text="{Binding GrandTotal, StringFormat='Grand Total: {0:C}'}"
                    FontAttributes="Bold"
+                   TextColor="#007ACC"
                    FontSize="Medium"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
                    Margin="0,20,0,20" />
 
-            <Entry Placeholder="Enter promo code"
+            <Entry Placeholder="Wprowadź kod rabatowy"
                    Text="{Binding PromoCode}"
                    HorizontalOptions="FillAndExpand"
                    TextColor="Black"
                    Margin="0,0,0,20" />
 
-            <Button Text="Apply Promo Code"
+            <Button Text="Zapisz kod rabatowy"
                     Command="{Binding ApplyPromoCodeCommand}"
                     BackgroundColor="#007ACC"
                     TextColor="White"

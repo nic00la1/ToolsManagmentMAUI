@@ -3,33 +3,142 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
              x:Class="ToolsManagmentMAUI.MVVM.Views.ShoppingCartPage"
+             x:Name="ShoppingCartPageInstance"
+             BackgroundColor="#f8f8f8"
              Title="Koszyk Zakupowy">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{Binding TotalItems}"
+                     Command="{Binding NavigateToCartCommand}"
+                     Order="Primary"
+                     Priority="0">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource Glyph="&#xf07a;" FontFamily="FontAwesome" Size="20" Color="White" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
 
     <ContentPage.BindingContext>
         <vm:ShoppingCartViewModel />
     </ContentPage.BindingContext>
 
-    <StackLayout Padding="20">
-        <Label Text="{Binding TotalItems, StringFormat='Total Items: {0}'}"
-               FontAttributes="Bold"
-               FontSize="Large"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"
-               Margin="0,0,0,20" />
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Label Text="Twój Koszyk"
+                   FontAttributes="Bold"
+                   FontSize="Large"
+                   TextColor="#007ACC"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Margin="0,0,0,20" />
 
-        <CollectionView ItemsSource="{Binding CartItems}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout Orientation="Horizontal" Padding="10">
-                        <Label Text="{Binding Tool.Name}" FontAttributes="Bold" VerticalOptions="Center" />
-                        <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}" VerticalOptions="Center" Margin="10,0,0,0" />
-                        <Label Text="{Binding TotalPrice, StringFormat='Total: {0:C}'}" VerticalOptions="Center" Margin="10,0,0,0" />
-                        <Button Text="Usuń" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingCartViewModel}}, Path=RemoveFromCartCommand}" CommandParameter="{Binding .}" />
-                    </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+            <Label Text="{Binding TotalItems, StringFormat='Total Items: {0}'}"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   TextColor="#007ACC"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Margin="0,0,0,20" />
 
-        <Button Text="Zamów" Command="{Binding CheckoutCommand}" BackgroundColor="#007ACC" TextColor="White" CornerRadius="10" Padding="10" HorizontalOptions="FillAndExpand" />
-    </StackLayout>
+            <CollectionView ItemsSource="{Binding CartItems}">
+                <CollectionView.EmptyView>
+                    <Label Text="Twój koszyk jest pusty."
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           FontAttributes="Bold"
+                           FontSize="Medium"
+                           TextColor="Gray" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="10"
+                               Padding="10"
+                               CornerRadius="20"
+                               HasShadow="True">
+                            <Frame.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#007ACC" Offset="0.0" />
+                                    <GradientStop Color="#00BFFF" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Frame.Background>
+                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                                <!-- Tool Image -->
+                                <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+                                       Source="{Binding Tool.ImageUrl}"
+                                       WidthRequest="60" HeightRequest="60"
+                                       Aspect="AspectFit"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,10,0" />
+
+                                <!-- Tool Name -->
+                                <Label Text="{Binding Tool.Name}" 
+                                       Grid.Row="0" Grid.Column="1" 
+                                       FontAttributes="Bold" 
+                                       FontSize="Medium" 
+                                       TextColor="White" />
+
+                                <!-- Tool Quantity -->
+                                <StackLayout Orientation="Horizontal" Grid.Row="1" Grid.Column="1" VerticalOptions="Center">
+                                    <Button Text="-" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingCartViewModel}}, Path=DecreaseQuantityCommand}" CommandParameter="{Binding .}" />
+                                    <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}" 
+                                           VerticalOptions="Center" 
+                                           TextColor="White" 
+                                           Margin="10,0,10,0" />
+                                    <Button Text="+" Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingCartViewModel}}, Path=IncreaseQuantityCommand}" CommandParameter="{Binding .}" />
+                                </StackLayout>
+
+                                <!-- Tool Subtotal Price -->
+                                <Label Text="{Binding SubtotalPrice, StringFormat='Subtotal: {0:C}'}" 
+                                       Grid.Row="1" Grid.Column="2" 
+                                       VerticalOptions="Center" 
+                                       TextColor="White" 
+                                       Margin="10,0,0,0" />
+
+                                <!-- Remove Button -->
+                                <Button Text="Usuń" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ShoppingCartViewModel}}, Path=RemoveFromCartCommand}" 
+                                        CommandParameter="{Binding .}" 
+                                        Grid.Row="1" Grid.Column="3" 
+                                        BackgroundColor="#FF0000" 
+                                        TextColor="White" 
+                                        CornerRadius="10" 
+                                        Padding="10" 
+                                        HorizontalOptions="FillAndExpand" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="{Binding GrandTotal, StringFormat='Grand Total: {0:C}'}"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   Margin="0,20,0,20" />
+
+            <Entry Placeholder="Enter promo code"
+                   Text="{Binding PromoCode}"
+                   HorizontalOptions="FillAndExpand"
+                   TextColor="Black"
+                   Margin="0,0,0,20" />
+
+            <Button Text="Apply Promo Code"
+                    Command="{Binding ApplyPromoCodeCommand}"
+                    BackgroundColor="#007ACC"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Padding="10"
+                    HorizontalOptions="FillAndExpand"
+                    Margin="0,0,0,20" />
+
+            <Button Text="Zamów" 
+                    Command="{Binding CheckoutCommand}" 
+                    BackgroundColor="#007ACC" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    Padding="10" 
+                    HorizontalOptions="FillAndExpand" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

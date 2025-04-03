@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:NullToDefaultImageConverter x:Key="NullToDefaultImageConverter" />
+            <converters:QuantityToColorConverter x:Key="QuantityToColorConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

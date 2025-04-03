@@ -17,6 +17,7 @@ public class ShoppingCartService
         new Tool { Id = 2, Name = "Œrubokrêt", Quantity = 20, Price = 30 },
         // Dodaj wiêcej narzêdzi wed³ug potrzeb
     };
+    public event EventHandler AvailableToolsChanged;
 
     public ShoppingCartService()
     {
@@ -148,6 +149,28 @@ public class ShoppingCartService
         if (tool != null)
         {
             _availableTools.Remove(tool);
+            OnAvailableToolsChanged();
         }
     }
+
+    public List<Tool> GetAvailableTools()
+    {
+        return _availableTools;
+    }
+
+    public void MarkToolAsUnavailable(int toolId)
+    {
+        var tool = _availableTools.FirstOrDefault(t => t.Id == toolId);
+        if (tool != null)
+        {
+            tool.Quantity = 0;
+            OnAvailableToolsChanged();
+        }
+    }
+
+    private void OnAvailableToolsChanged()
+    {
+        AvailableToolsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
 }

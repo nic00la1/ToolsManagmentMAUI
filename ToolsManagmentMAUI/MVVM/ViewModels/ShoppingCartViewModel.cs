@@ -46,6 +46,9 @@ namespace ToolsManagmentMAUI.ViewModels
             _shoppingCartService = new ShoppingCartService();
             _alertService = new AlertService();
             _orderService = new OrderService(_shoppingCartService);
+            _shoppingCartService.AvailableToolsChanged += OnAvailableToolsChanged;
+
+
             AddToCartCommand =
                 new Command<Tool>(async (tool) => await AddToCartAsync(tool));
             RemoveFromCartCommand = new Command<ShoppingCartItem>(async (item) =>
@@ -63,6 +66,8 @@ namespace ToolsManagmentMAUI.ViewModels
             CartItems.CollectionChanged +=
                 (s, e) => UpdateCart();
             InitializeAsync();
+
+
         }
 
         private async void InitializeAsync()
@@ -185,11 +190,15 @@ namespace ToolsManagmentMAUI.ViewModels
                     tool.Quantity -= item.Quantity;
                     if (tool.Quantity <= 0)
                     {
-                        _shoppingCartService.RemoveTool(tool.Id);
+                        tool.Quantity = 0; // Set tool quantity to 0
+                        _shoppingCartService.MarkToolAsUnavailable(tool.Id);
                     }
                 }
                 _shoppingCartService.CartItems.Remove(item);
             }
+
+            // Notify about the changes
+            OnAvailableToolsChanged(this, EventArgs.Empty);
 
             // Save changes to the cart
             _shoppingCartService.SaveCartAsync();
@@ -227,6 +236,12 @@ namespace ToolsManagmentMAUI.ViewModels
         public int GetAvailableQuantity(int toolId)
         {
             return _shoppingCartService.GetAvailableQuantity(toolId);
+        }
+
+        private void OnAvailableToolsChanged(object sender, EventArgs e)
+        {
+            // Notify MainPageViewModel about the changes
+            MessagingCenter.Send(this, "AvailableToolsChanged");
         }
     }
 }

@@ -5,10 +5,19 @@ using ToolsManagmentMAUI.Models;
 using ToolsManagmentMAUI.MVVM.Views;
 using ToolsManagmentMAUI.Services;
 
+
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Input;
+using ToolsManagmentMAUI.Models;
+using ToolsManagmentMAUI.MVVM.Views;
+using ToolsManagmentMAUI.Services;
+
 namespace ToolsManagmentMAUI.ViewModels;
 
 public class MainPageViewModel : BindableObject
 {
+    private readonly ShoppingCartService _shoppingCartService;
     private readonly ToolService _toolService;
     private readonly AlertService _alertService;
     private ObservableCollection<Tool> _allTools;
@@ -63,6 +72,12 @@ public class MainPageViewModel : BindableObject
             new Command(async () => await NavigateToCartAsync());
         AddToCartCommand = new Command<Tool>(AddToCart);
         LoadToolsCommand.Execute(null);
+
+        _shoppingCartService = new ShoppingCartService();
+        MessagingCenter.Subscribe<ShoppingCartViewModel>(this, "AvailableToolsChanged", (sender) =>
+        {
+            UpdateAvailableTools();
+        });
     }
 
     public MainPageViewModel(ToolService toolService, AlertService alertService)
@@ -170,6 +185,17 @@ public class MainPageViewModel : BindableObject
         else
             Tools = new ObservableCollection<Tool>(_allTools.Where(t =>
                 t.Name.ToLower().Contains(SearchQuery.ToLower())));
+        OnPropertyChanged(nameof(Tools));
+    }
+
+    private void UpdateAvailableTools()
+    {
+        Tools.Clear();
+        foreach (var tool in _shoppingCartService.GetAvailableTools())
+        {
+            Tools.Add(tool);
+        }
+        _allTools = new ObservableCollection<Tool>(Tools);
         OnPropertyChanged(nameof(Tools));
     }
 }

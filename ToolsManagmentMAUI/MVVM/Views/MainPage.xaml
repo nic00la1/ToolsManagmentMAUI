@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ToolsManagmentMAUI.ViewModels"
+             xmlns:converters="clr-namespace:ToolsManagmentMAUI.Converters"
              x:Class="ToolsManagmentMAUI.MVVM.Views.MainPage"
              x:Name="MainPageInstance"
              BackgroundColor="#f8f8f8"
@@ -85,7 +86,7 @@
                                            Grid.Row="0" Grid.Column="1" 
                                            FontAttributes="Bold" 
                                            FontSize="Medium" 
-                                           TextColor="White" />
+                                           TextColor="{Binding Quantity, Converter={StaticResource QuantityToColorConverter}}" />
 
                                     <!-- Tool Quantity -->
                                     <StackLayout Orientation="Horizontal" Grid.Row="1" Grid.Column="1" VerticalOptions="Center">
@@ -99,7 +100,7 @@
                                         </Frame>
                                         <Label Text="{Binding Quantity, StringFormat='x{0}'}" 
                                                VerticalOptions="Center" 
-                                               TextColor="White" 
+                                               TextColor="{Binding Quantity, Converter={StaticResource QuantityToColorConverter}}" 
                                                Margin="10,0,0,0" />
                                     </StackLayout>
 
@@ -127,7 +128,8 @@
                                             TextColor="White"
                                             CornerRadius="10"
                                             Padding="10"
-                                            HorizontalOptions="FillAndExpand">
+                                            HorizontalOptions="FillAndExpand"
+                                            IsEnabled="{Binding Quantity, Converter={StaticResource QuantityToColorConverter}}">
                                         <Button.ImageSource>
                                             <FontImageSource Glyph="&#xf07a;" FontFamily="FontAwesome" Size="20" Color="White" />
                                         </Button.ImageSource>

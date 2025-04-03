@@ -11,6 +11,12 @@ public class ShoppingCartService
     private const string CartFileName = "shopping_cart.json";
     private readonly string _filePath;
     private ObservableCollection<ShoppingCartItem> _cartItems;
+    private List<Tool> _availableTools = new List<Tool>
+    {
+        new Tool { Id = 1, Name = "M³otek", Quantity = 10, Price = 50 },
+        new Tool { Id = 2, Name = "Œrubokrêt", Quantity = 20, Price = 30 },
+        // Dodaj wiêcej narzêdzi wed³ug potrzeb
+    };
 
     public ShoppingCartService()
     {
@@ -35,13 +41,66 @@ public class ShoppingCartService
             _cartItems.FirstOrDefault(item => item.Tool.Id == tool.Id);
         if (existingItem != null)
         {
-            existingItem.Quantity++;
-            existingItem.TotalPrice = existingItem.Quantity * tool.Price;
-        } else
-            _cartItems.Add(new ShoppingCartItem
-                { Tool = tool, Quantity = 1, TotalPrice = tool.Price });
+            if (existingItem.Quantity < tool.Quantity)
+            {
+                existingItem.Quantity++;
+                existingItem.TotalPrice = existingItem.Quantity * tool.Price;
+            }
+            else
+            {
+                // Inform the user that they cannot add more items than available in the store
+                throw new InvalidOperationException("Nie mo¿na dodaæ wiêcej narzêdzi ni¿ dostêpnych w sklepie.");
+            }
+        }
+        else
+        {
+            if (tool.Quantity > 0)
+            {
+                _cartItems.Add(new ShoppingCartItem
+                {
+                    Tool = tool,
+                    Quantity = 1,
+                    TotalPrice = tool.Price
+                });
+            }
+            else
+            {
+                // Inform the user that they cannot add an item that is not available in the store
+                throw new InvalidOperationException("Nie mo¿na dodaæ narzêdzia, które nie jest dostêpne w sklepie.");
+            }
+        }
+
+        // Zmniejsz iloœæ dostêpnych narzêdzi w sklepie
+        var availableTool = _availableTools.FirstOrDefault(t => t.Id == tool.Id);
+        if (availableTool != null)
+        {
+            availableTool.Quantity--;
+        }
 
         await SaveCartAsync();
+    }
+
+    public async Task IncreaseQuantityAsync(ShoppingCartItem item)
+    {
+        if (item != null)
+        {
+            var tool = _availableTools.FirstOrDefault(t => t.Id == item.Tool.Id);
+            if (tool != null && item.Quantity < tool.Quantity)
+            {
+                item.Quantity++;
+                item.TotalPrice = item.Quantity * tool.Price;
+
+                // Zmniejsz iloœæ dostêpnych narzêdzi w sklepie
+                tool.Quantity--;
+
+                await SaveCartAsync();
+            }
+            else
+            {
+                // Inform the user that they cannot increase the quantity beyond available stock
+                throw new InvalidOperationException("Nie mo¿na zwiêkszyæ iloœci powy¿ej dostêpnej w sklepie.");
+            }
+        }
     }
 
     public async Task RemoveFromCartAsync(ShoppingCartItem item)
@@ -70,5 +129,16 @@ public class ShoppingCartService
                 foreach (ShoppingCartItem item in items) _cartItems.Add(item);
             }
         }
+    }
+
+    public int GetAvailableQuantity(int toolId)
+    {
+        var tool = _availableTools.FirstOrDefault(t => t.Id == toolId);
+        return tool?.Quantity ?? 0;
+    }
+
+    public Tool GetAvailableTool(int toolId)
+    {
+        return _availableTools.FirstOrDefault(t => t.Id == toolId);
     }
 }

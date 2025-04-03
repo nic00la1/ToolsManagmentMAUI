@@ -70,8 +70,15 @@ public class ShoppingCartViewModel : BaseViewModel
 
     private async Task AddToCartAsync(Tool tool)
     {
-        await _shoppingCartService.AddToCartAsync(tool);
-        UpdateCart();
+        try
+        {
+            await _shoppingCartService.AddToCartAsync(tool);
+            UpdateCart();
+        }
+        catch (InvalidOperationException ex)
+        {
+            await _alertService.ShowErrorMessageAsync(ex.Message);
+        }
     }
 
     private async Task RemoveFromCartAsync(ShoppingCartItem item)
@@ -84,10 +91,15 @@ public class ShoppingCartViewModel : BaseViewModel
     {
         if (item != null)
         {
-            item.Quantity++;
-            item.TotalPrice = item.Tool.Price * item.Quantity;
-            await _shoppingCartService.SaveCartAsync();
-            UpdateCart();
+            try
+            {
+                await _shoppingCartService.IncreaseQuantityAsync(item);
+                UpdateCart();
+            }
+            catch (InvalidOperationException ex)
+            {
+                await _alertService.ShowErrorMessageAsync(ex.Message);
+            }
         }
     }
 
@@ -97,6 +109,14 @@ public class ShoppingCartViewModel : BaseViewModel
         {
             item.Quantity--;
             item.TotalPrice = item.Tool.Price * item.Quantity;
+
+            // Zwiêksz iloœæ dostêpnych narzêdzi w sklepie
+            var tool = _shoppingCartService.GetAvailableTool(item.Tool.Id);
+            if (tool != null)
+            {
+                tool.Quantity++;
+            }
+
             await _shoppingCartService.SaveCartAsync();
             UpdateCart();
         }
@@ -117,12 +137,14 @@ public class ShoppingCartViewModel : BaseViewModel
             _isPromoCodeApplied = true;
             await _alertService.ShowSuccessMessageAsync(
                 "10% Zni¿ki w³aœnie wlecia³o, na twoje produkty.");
-        } else if (PromoCode == "DISCOUNT20")
+        }
+        else if (PromoCode == "DISCOUNT20")
         {
             _isPromoCodeApplied = true;
             await _alertService.ShowSuccessMessageAsync(
                 "20% Zni¿ki w³aœnie wlecia³o, na twoje produkty.");
-        } else
+        }
+        else
         {
             _discount = 0;
             await _alertService.ShowErrorMessageAsync(
@@ -170,11 +192,17 @@ public class ShoppingCartViewModel : BaseViewModel
                 _discount =
                     CartItems.Sum(item => item.TotalPrice) *
                     0.20m; // 20% discount
-        } else
+        }
+        else
             _discount = 0;
 
         OnPropertyChanged(nameof(TotalItems));
         OnPropertyChanged(nameof(GrandTotal));
         OnPropertyChanged(nameof(DiscountAmount));
+    }
+
+    public int GetAvailableQuantity(int toolId)
+    {
+        return _shoppingCartService.GetAvailableQuantity(toolId);
     }
 }

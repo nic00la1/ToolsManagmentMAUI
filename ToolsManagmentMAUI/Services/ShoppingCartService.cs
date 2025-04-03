@@ -141,4 +141,13 @@ public class ShoppingCartService
     {
         return _availableTools.FirstOrDefault(t => t.Id == toolId);
     }
+
+    public void RemoveTool(int toolId)
+    {
+        var tool = _availableTools.FirstOrDefault(t => t.Id == toolId);
+        if (tool != null)
+        {
+            _availableTools.Remove(tool);
+        }
+    }
 }

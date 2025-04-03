@@ -176,12 +176,31 @@ namespace ToolsManagmentMAUI.ViewModels
             // Process order
             _orderService.ProcessOrder(CartItems);
 
+            // Update available tools and clear cart items
+            foreach (var item in CartItems.ToList())
+            {
+                var tool = _shoppingCartService.GetAvailableTool(item.Tool.Id);
+                if (tool != null)
+                {
+                    tool.Quantity -= item.Quantity;
+                    if (tool.Quantity <= 0)
+                    {
+                        _shoppingCartService.RemoveTool(tool.Id);
+                    }
+                }
+                _shoppingCartService.CartItems.Remove(item);
+            }
+
+            // Save changes to the cart
+            _shoppingCartService.SaveCartAsync();
+
             // Reset promo code and related properties after checkout
             PromoCode = string.Empty;
             _discount = 0;
             _isPromoCodeApplied = false;
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(DiscountAmount));
+            OnPropertyChanged(nameof(TotalItems));
         }
 
         private void UpdateCart()

@@ -24,6 +24,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ToolService>();
         builder.Services.AddSingleton<AlertService>();
         builder.Services.AddSingleton<ShoppingCartService>();
+        builder.Services.AddSingleton<OrderService>();
 
         return builder.Build();
     }
